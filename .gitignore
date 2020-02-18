@@ -1,0 +1,8 @@
+# Xcode
+.DS_Store
+.xcodeproj
+*/build/*
+*.xccheckout
+*.xcworkspace
+*.pbxproj
+*.plist

@@ -14,9 +14,9 @@
 void cz_init(){
     for (int i = 0; i < IMEM_SIZE; i++) {
         imem[i].opv = opEND;
-        imem[i].arg1 = 0;
-        imem[i].arg2 = 0;
-        imem[i].arg3 = 0;
+        imem[i].r = 0;
+        imem[i].s = 0;
+        imem[i].t = 0;
     }
     memset(dmem, 0, sizeof(dmem));
     memset(regs, 0, sizeof(regs));
@@ -45,7 +45,7 @@ void cz_load(){
             printf("寄存器 %d 不存在！\n",t);
             exit(-1);
         }
-        imem[i].arg1=r;imem[i].arg2=s;imem[i].arg3=t;
+        imem[i].r=r;imem[i].s=s;imem[i].t=t;
         
         i++;
     }
@@ -57,7 +57,7 @@ void cz_run() {
     while (imem[regs[REG_PC]].opv != opEND) {
         st = op_exec(&imem[regs[REG_PC]]);
         if (st == stateErr) {
-            printf("运行出错！\n");
+            printf("指令存在错误！PC:%d\n",regs[REG_PC]);
             exit(-1);
         }
         regs[REG_PC]++;

@@ -19,6 +19,7 @@ typedef enum{
     
     opIN,
     opOUT,
+    
     opLD,
     opST,
     opLDA,
@@ -30,9 +31,9 @@ typedef enum{
 
 typedef struct{
     opCode opv;
-    int arg1;
-    int arg2;
-    int arg3;
+    int r;
+    int s;
+    int t;
 } op_t;
 
 opCode map_opCode(char *op) {
@@ -43,6 +44,7 @@ opCode map_opCode(char *op) {
     
     if (!strcmp(op,"IN")) return opIN;
     if (!strcmp(op,"OUT")) return opOUT;
+    
     if (!strcmp(op,"LD")) return opLD;
     if (!strcmp(op,"ST")) return opST;
     if (!strcmp(op,"LDA")) return opLDA;
@@ -54,28 +56,45 @@ opCode map_opCode(char *op) {
 
 
 opState exec_add(op_t *op) {
-    dmem[op->arg1] = dmem[op->arg2] + dmem[op->arg3];
+    regs[op->r] = regs[op->s] + regs[op->t];
     return stateCor;
 }
 opState exec_sub(op_t *op) {
-    dmem[op->arg1] = dmem[op->arg2] - dmem[op->arg3];
+    regs[op->r] = regs[op->s] - regs[op->t];
     return stateCor;
 }
 opState exec_mul(op_t *op) {
-    dmem[op->arg1] = dmem[op->arg2] * dmem[op->arg3];
+    regs[op->r] = regs[op->s] * regs[op->t];
     return stateCor;
 }
 opState exec_div(op_t *op) {
-    dmem[op->arg1] = dmem[op->arg2] / dmem[op->arg3];
+    regs[op->r] = regs[op->s] / regs[op->t];
     return stateCor;
 }
 
 opState exec_in(op_t *op) {
-    scanf("%d",&dmem[op->arg1]);
+    scanf("%d",&regs[op->r]);
     return stateCor;
 }
 opState exec_out(op_t *op) {
-    printf("%d",dmem[op->arg1]);
+    printf("%d",regs[op->r]);
+    return stateCor;
+}
+
+opState exec_ld(op_t *op) {
+    regs[op->r] = dmem[regs[op->s]+op->t];
+    return stateCor;
+}
+opState exec_st(op_t *op) {
+    dmem[regs[op->s]+op->t] = regs[op->r];
+    return stateCor;
+}
+opState exec_lda(op_t *op) {
+    regs[op->r] = regs[op->s]+op->t;
+    return stateCor;
+}
+opState exec_ldc(op_t *op) {
+    regs[op->r] = op->t;
     return stateCor;
 }
 
@@ -89,6 +108,11 @@ opState op_exec(op_t *op) {
         case opIN: return exec_in(op);
         case opOUT: return exec_out(op);
             
-        default:return stateErr;
+        case opLD: return exec_ld(op);
+        case opST: return exec_st(op);
+        case opLDA: return exec_lda(op);
+        case opLDC: return exec_ldc(op);
+            
+        default: return stateErr;
     }
 }
